@@ -24,7 +24,7 @@
 
 ```bash
 # 1. clone
-git clone https://github.com/Heliodroid/GDP-data-extractor.git
+git clone https://github.com/Heliodroid/gdp-extractor.git
 cd gdp-extractor
 
 # 2. install deps
