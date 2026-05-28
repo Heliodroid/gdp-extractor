@@ -39,18 +39,25 @@ COUNTRIES = {
 def fetch_indicator(country_code: str, indicator: str, start: int, end: int) -> pd.DataFrame:
     url = (f"{WB_BASE}/country/{country_code}/indicator/{indicator}"
            f"?date={start}:{end}&format=json&per_page=100")
-    try:
-        r = requests.get(url, timeout=10)
-        r.raise_for_status()
-        payload = r.json()
-        if len(payload) < 2 or not payload[1]:
+    for attempt in range(3):
+        try:
+            r = requests.get(url, timeout=30)
+            r.raise_for_status()
+            break
+        except requests.exceptions.Timeout:
+            if attempt == 2:
+                st.warning(f"Timeout fetching {country_code} after 3 attempts.")
+                return pd.DataFrame()
+            import time; time.sleep(2)
+        except Exception as e:
+            st.warning(f"Could not fetch {country_code}: {e}")
             return pd.DataFrame()
-        rows = [{"year": int(d["date"]), "value": d["value"]}
-                for d in payload[1] if d["value"] is not None]
-        return pd.DataFrame(rows).sort_values("year").reset_index(drop=True)
-    except Exception as e:
-        st.warning(f"Could not fetch {country_code}: {e}")
+    payload = r.json()
+    if len(payload) < 2 or not payload[1]:
         return pd.DataFrame()
+    rows = [{"year": int(d["date"]), "value": d["value"]}
+            for d in payload[1] if d["value"] is not None]
+    return pd.DataFrame(rows).sort_values("year").reset_index(drop=True)
 
 def fmt_val(val: float, indicator: str) -> str:
     if "%" in indicator:
