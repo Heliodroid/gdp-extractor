@@ -66,14 +66,7 @@ gdp-extractor/
 
 ---
 
-## Deployment (Streamlit Community Cloud)
 
-1. Push repo to GitHub
-2. Go to [share.streamlit.io](https://share.streamlit.io)
-3. Connect repo → set **Main file path** to `app.py`
-4. Deploy — done
-
-No secrets or env vars needed.
 
 ---
 
